@@ -1,4 +1,4 @@
-class TodosController < UIViewController
+class TodosController < UITableViewController
   def viewDidLoad
     view.backgroundColor = UIColor.whiteColor
   end
