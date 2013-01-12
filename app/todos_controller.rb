@@ -1,10 +1,18 @@
 class TodosController < UITableViewController
   def viewDidLoad
-    @items = [
-      Todo.new({'title' => 'foo', 'body' => 'foo body', 'done' => true}),
-      Todo.new({'title' => 'bar', 'body' => 'bar body', 'done' => false}),
-      Todo.new({'title' => 'baz', 'body' => 'baz body', 'done' => true})
-    ]
+    @items = []
+    BW::HTTP.get('http://localhost:3000/todos.json') do |response|
+      if response.ok?
+        json = BW::JSON.parse(response.body.to_str)
+        json.each do |hash|
+          todo = Todo.new(hash)
+          @items << todo
+        end
+        tableView.reloadData
+      else
+        App.alert('エラーが起きました')
+      end
+    end
     navigationItem.title = 'TODOs'
     view.backgroundColor = UIColor.whiteColor
   end
