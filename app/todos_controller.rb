@@ -1,20 +1,12 @@
 class TodosController < UITableViewController
   def viewDidLoad
     @items = []
-    BW::HTTP.get('http://localhost:3000/todos.json') do |response|
-      if response.ok?
-        json = BW::JSON.parse(response.body.to_str)
-        json.each do |hash|
-          todo = Todo.new(hash)
-          @items << todo
-        end
-        tableView.reloadData
-      else
-        App.alert('エラーが起きました')
-      end
-    end
     navigationItem.title = 'TODOs'
     view.backgroundColor = UIColor.whiteColor
+    self.refreshControl = UIRefreshControl.new.tap do |r|
+      r.addTarget(self, action:'load_todos', forControlEvents:UIControlEventValueChanged)
+    end
+    load_todos
   end
 
   def tableView(tableView, numberOfRowsInSection:section)
@@ -34,5 +26,23 @@ class TodosController < UITableViewController
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     todo = @items[indexPath.row]
     p todo
+  end
+
+  private
+  def load_todos
+    BW::HTTP.get('http://localhost:3000/todos.json') do |response|
+      if response.ok?
+        @items = []
+        json = BW::JSON.parse(response.body.to_str)
+        json.each do |hash|
+          todo = Todo.new(hash)
+          @items << todo
+        end
+        tableView.reloadData
+      else
+        App.alert('エラーが起きました')
+      end
+      self.refreshControl.endRefreshing
+    end
   end
 end
