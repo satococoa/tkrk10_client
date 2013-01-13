@@ -78,7 +78,20 @@ class TodosController < UITableViewController
         end
       end
       f.on_submit do |form|
-        p form.render
+        data = {todo: form.render}
+        update_todo(todo.remote_id, data)
+      end
+    end
+  end
+
+  def update_todo(remote_id, data)
+    url = API_BASE + "/todos/#{remote_id}"
+    BW::HTTP.put(url, {payload: data}) do |response|
+      if response.ok?
+        self.navigationController.popViewControllerAnimated(true)
+        load_todos
+      else
+        App.alert('更新に失敗しました')
       end
     end
   end
