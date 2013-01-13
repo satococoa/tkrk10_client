@@ -7,6 +7,8 @@ class TodosController < UITableViewController
     self.refreshControl = UIRefreshControl.new.tap do |r|
       r.addTarget(self, action:'load_todos', forControlEvents:UIControlEventValueChanged)
     end
+    create_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action:'show_create_form')
+    navigationItem.rightBarButtonItem = create_button
     load_todos
   end
 
@@ -26,9 +28,7 @@ class TodosController < UITableViewController
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     todo = @items[indexPath.row]
-    form = setup_form(todo)
-    controller = Formotion::FormController.alloc.initWithForm(form)
-    navigationController.pushViewController(controller, animated:true)
+    show_todo_form(todo)
   end
 
   private
@@ -94,5 +94,15 @@ class TodosController < UITableViewController
         App.alert('更新に失敗しました')
       end
     end
+  end
+
+  def show_create_form
+    show_todo_form(Todo.new)
+  end
+
+  def show_todo_form(todo)
+    form = setup_form(todo)
+    controller = Formotion::FormController.alloc.initWithForm(form)
+    navigationController.pushViewController(controller, animated:true)
   end
 end
