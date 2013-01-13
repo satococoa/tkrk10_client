@@ -79,7 +79,11 @@ class TodosController < UITableViewController
       end
       f.on_submit do |form|
         data = {todo: form.render}
-        update_todo(todo.remote_id, data)
+        if todo.remote_id.nil?
+          create_todo(data)
+        else
+          update_todo(todo.remote_id, data)
+        end
       end
     end
   end
@@ -104,5 +108,17 @@ class TodosController < UITableViewController
     form = setup_form(todo)
     controller = Formotion::FormController.alloc.initWithForm(form)
     navigationController.pushViewController(controller, animated:true)
+  end
+
+  def create_todo(data)
+    url = API_BASE + "/todos"
+    BW::HTTP.post(url, {payload: data}) do |response|
+      if response.ok?
+        self.navigationController.popViewControllerAnimated(true)
+        load_todos
+      else
+        App.alert('作成に失敗しました')
+      end
+    end
   end
 end
