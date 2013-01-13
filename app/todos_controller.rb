@@ -25,7 +25,9 @@ class TodosController < UITableViewController
 
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     todo = @items[indexPath.row]
-    p todo
+    form = setup_form(todo)
+    controller = Formotion::FormController.alloc.initWithForm(form)
+    navigationController.pushViewController(controller, animated:true)
   end
 
   private
@@ -43,6 +45,40 @@ class TodosController < UITableViewController
         App.alert('エラーが起きました')
       end
       self.refreshControl.endRefreshing
+    end
+  end
+
+  def setup_form(todo)
+    form = Formotion::Form.new.tap do |f|
+      f.build_section do |section|
+        section.build_row do |row|
+          row.title = 'title'
+          row.key = :title
+          row.value = todo.title
+          row.type = :string
+        end
+        section.build_row do |row|
+          row.title = 'body'
+          row.key = :body
+          row.value = todo.body
+          row.type = :string
+        end
+        section.build_row do |row|
+          row.title = 'done'
+          row.key = :done
+          row.value = todo.done
+          row.type = :switch
+        end
+      end
+      f.build_section do |section|
+        section.build_row do |row|
+          row.title = 'Submit'
+          row.type = :submit
+        end
+      end
+      f.on_submit do |form|
+        p form.render
+      end
     end
   end
 end
