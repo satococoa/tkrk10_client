@@ -31,6 +31,11 @@ class TodosController < UITableViewController
     show_todo_form(todo)
   end
 
+  def tableView(tableView, commitEditingStyle:editingStyle, forRowAtIndexPath:indexPath)
+    todo = @items[indexPath.row]
+    remove_todo(todo)
+  end
+
   private
   def load_todos
     BW::HTTP.get(API_BASE + '/todos.json') do |response|
@@ -115,6 +120,18 @@ class TodosController < UITableViewController
     BW::HTTP.post(url, {payload: data}) do |response|
       if response.ok?
         self.navigationController.popViewControllerAnimated(true)
+        load_todos
+      else
+        App.alert('作成に失敗しました')
+      end
+    end
+  end
+
+  def remove_todo(todo)
+    raise App.alert('データが保存されていません') if todo.remote_id.nil?
+    url = API_BASE + "/todos/#{todo.remote_id}"
+    BW::HTTP.delete(url) do |response|
+      if response.ok?
         load_todos
       else
         App.alert('作成に失敗しました')
