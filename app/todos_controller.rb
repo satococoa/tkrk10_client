@@ -9,6 +9,7 @@ class TodosController < UITableViewController
     end
     create_button = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action:'show_create_form')
     navigationItem.rightBarButtonItem = create_button
+    navigationItem.leftBarButtonItem = self.editButtonItem
     load_todos
   end
 
