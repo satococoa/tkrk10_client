@@ -1,4 +1,5 @@
 class TodosController < UITableViewController
+  API_BASE = 'http://localhost:3000'
   def viewDidLoad
     @items = []
     navigationItem.title = 'TODOs'
@@ -32,7 +33,7 @@ class TodosController < UITableViewController
 
   private
   def load_todos
-    BW::HTTP.get('http://localhost:3000/todos.json') do |response|
+    BW::HTTP.get(API_BASE + '/todos.json') do |response|
       if response.ok?
         @items = []
         json = BW::JSON.parse(response.body.to_str)
