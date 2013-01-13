@@ -1,6 +1,8 @@
 class Todo
-  attr_accessor :title, :body, :done
+  attr_accessor :remote_id, :title, :body, :done
+
   def initialize(hash = {})
+    @remote_id = hash['id']
     @title = hash['title']
     @body = hash['body']
     @done = hash['done']
